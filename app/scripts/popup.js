@@ -1,3 +1,5 @@
+'use strict';
+
 var s,
 SliderWidget = {
 
@@ -10,6 +12,13 @@ SliderWidget = {
 		this.settings = $.extend(this.settings, options);
 		this.settings.self = this;
 		s = this.settings;
+
+		console.log('Roughcogs initialized');
+
+		if (s.table.length < 1) {
+			console.log('no table found');
+			return false;
+		}
 
 		this.prepareHTML();
 
