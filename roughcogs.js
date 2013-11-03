@@ -17,7 +17,7 @@ SliderWidget = {
 			s.self.haves($(this));
 			s.self.wants($(this));
 			s.self.ratio($(this));
-			//s.self.price($(this));
+			s.self.price($(this));
 		});
 
 		this.tablesorting();
@@ -103,19 +103,42 @@ SliderWidget = {
 	},
 
 	price: function($row){
-		var $priceEl = $row.children('td:eq(3)');
+		var $priceEl = $row.children('td:eq(6)');
 		var price = $priceEl.find('.price').text();
+
+		// if ($row.index() === 1) {
+		// 	var $headerRow = s.collection.children('tr').eq(0);
+		// 	var $priceHeader = $headerRow.children('th').eq(6);
+
+		// 	var newTitle = price.toString().atChar(0) + price;
+		// 	$priceHeader.text(newTitle);
+		// }
+
 		//var priceEuro = pricePounds.next('span i').text();
 
 		// filter it out using a regular expression
 		//var r = /\d+/;
 		//pricePounds = pricePounds.match(r);
 
+		//var currencySymbol = price.atChar(0);
+
+		// remove currency from string
 		price = price.substring(1);
 		//$priceEl.html(Math.round(price * 8.77965874) + ' kr');
-		$priceEl.html(price);
 
+		$priceEl.html(price);
 		this.saveData($row, 'price', price);
+	},
+
+	getPrice: function(string) {
+
+		// turn it into a js object and get the text
+		price = $(string)[0].innerText;
+
+		// remove currency symbol
+		price = price.substring(1);
+
+		return price;
 	},
 
 	saveData: function($row, property, value) {
@@ -148,6 +171,21 @@ SliderWidget = {
 
 				// set 'haves', 'wants' and 'ratio' as numeric values
 				{ "sType": "numeric", "aTargets": [ 3,4,5 ] }
+
+
+				// // temporary hide everything but price
+				// { "bVisible": false, "aTargets": [ 0,1,3,4,5,7 ] },
+				// {
+				// 	"aTargets": [ 0 ],
+				// 	"mData": function(source,type, val) {
+				// 		var string = 'no price'
+				// 		if (source[6]) {
+				// 			string = s.self.getPrice( source[6] );
+				// 		}
+				// 		return string;
+
+				// 	}
+				// }
 			]
 
 		});
