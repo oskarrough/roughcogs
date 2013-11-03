@@ -1,0 +1,180 @@
+body {
+	min-width: 0;
+}
+
+
+/*.mpitems td.rc:first-child
+.mpitems td.rc:last-child {
+	display: none;
+}*/
+
+.mpitems {
+	opacity: 0.1;
+	background-color: #ccc;
+}
+.mpitems.is-processed {
+	opacity: 1;
+	background-color: transparent;
+}
+
+/*
+.sorting_asc,
+.sorting_desc {
+	color: red;
+	font-weight: bold;
+}
+
+
+.DataTables_processing {
+	position: fixed;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	background: red;
+	color: white;
+}
+*/
+
+
+
+
+
+
+/*
+ * Table
+ */
+.dataTable {
+	margin: 0 auto;
+	clear: both;
+	width: 100%;
+}
+
+.dataTable th {
+	padding: 3px 18px 3px 10px;
+	border-bottom: 1px solid black;
+	font-weight: bold;
+	cursor: pointer;
+	*cursor: hand;
+}
+.dataTable .sorting_disabled {
+	cursor: default;
+}
+.dataTable td {
+	padding-right: 19px;
+}
+.dataTable td.center,
+.dataTable td.dataTables_empty {
+	text-align: center;
+}
+
+.dataTable tr.odd td.sorting_1 { background-color: #D3D6FF; }
+.dataTable tr.odd td.sorting_2 { background-color: #DADCFF; }
+.dataTable tr.odd td.sorting_3 { background-color: #E0E2FF; }
+.dataTable tr.even td.sorting_1 { background-color: #EAEBFF; }
+.dataTable tr.even td.sorting_2 { background-color: #F2F3FF; }
+.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
+
+
+/*
+ * Table wrapper
+ */
+.dataTables_wrapper {
+	position: relative;
+	clear: both;
+	*zoom: 1;
+}
+
+
+/*
+ * Page length menu
+ */
+.dataTables_length {
+	float: left;
+}
+
+
+/*
+ * Filter
+ */
+.dataTables_filter {
+	float: right;
+	text-align: right;
+}
+
+
+/*
+ * Table information
+ */
+.dataTables_info {
+	clear: both;
+	float: left;
+}
+
+
+/*
+ * Processing indicator
+ */
+.dataTables_processing {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 250px;
+	height: 30px;
+	margin-left: -125px;
+	margin-top: -15px;
+	padding: 14px 0 2px 0;
+	border: 1px solid #ddd;
+	text-align: center;
+	color: #999;
+	font-size: 14px;
+	background-color: white;
+}
+
+
+/*
+ * Sorting
+ */
+.dataTable .sorting {
+	background-image: url('http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/images/sort_both.png');
+	background-repeat: no-repeat;
+	background-position: center right;
+}
+.dataTable .sorting_asc {
+	background-image: url('http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/images/sort_asc.png');
+	background-repeat: no-repeat;
+	background-position: center right;
+}
+.dataTable .sorting_desc {
+	background-image: url('http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/images/sort_desc.png');
+	background-repeat: no-repeat;
+	background-position: center right;
+}
+.dataTable .sorting_asc_disabled {
+	background-image: url('http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/images/sort_asc_disabled.png');
+	background-repeat: no-repeat;
+	background-position: center right;
+}
+.dataTable .sorting_desc_disabled {
+	background-image: url('http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/images/sort_desc_disabled.png');
+	background-repeat: no-repeat;
+	background-position: center right;
+}
+
+.dataTable thead th:active,
+.dataTable thead td:active {
+	outline: none;
+}
+
+
+/*
+ * Scrolling
+ */
+.dataTables_scroll {
+	clear: both;
+}
+
+.dataTables_scrollBody {
+	*margin-top: -1px;
+	-webkit-overflow-scrolling: touch;
+}
