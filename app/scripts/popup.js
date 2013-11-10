@@ -14,15 +14,15 @@ var Roughcogs = {
 		console.log('Roughcogs initialized');
 
 		// Only run if there is a table
-		var tableExists = s.table.length < 1;
-		if (tableExists) {
+		var table = s.table.length > 0;
+		if (!table) {
 			console.log('no table found');
 			return false;
 		}
 
 		// Check the type of page we are on
-		var releaseList = s.table.find('thead').length > 0;
-		if (releaseList) {
+		var release = s.table.find('thead').length > 0;
+		if (release) {
 			s.type = 'release';
 		}
 
@@ -38,7 +38,13 @@ var Roughcogs = {
 			this.columnsRelease();
 		}
 
-		//this.tablesorting();
+		if (s.type === 'list') {
+			this.tablesorting();
+		}
+
+		if (s.type === 'release') {
+			this.tablesortingRelease();
+		}
 		s.table.removeClass('is-loading').addClass('is-processed');
 	},
 
@@ -60,18 +66,24 @@ var Roughcogs = {
 	},
 
 	columns: function() {
+
 		// we are adding new cols for haves, wants and ratio
 		// so add the complementary <th> for them
-		var $headerRow = s.collection.children('tr').eq(0);
+		var $headerRow = s.table.find('thead').children('tr');
+
 		// insert them after the 3rd col
-		$headerRow.find('th:eq(2)')
-			.after('<th>Haves</th><th>Wants</th><th>Ratio</th>');
+		//$headerRow.children('th:eq(2)').after('<th>Haves</th><th>Wants</th><th>Ratio</th>');
+
+		s.self.addTableHeader(2, 'Haves');
+		s.self.addTableHeader(3, 'Wants');
+		s.self.addTableHeader(4, 'Ratio');
 
 		s.collection.children('tr').each(function(index) {
+			s.self.price($(this));
 			s.self.haves($(this));
 			s.self.wants($(this));
 			s.self.ratio($(this));
-			s.self.price($(this));
+			//s.self.graphs($this));
 		});
 	},
 
@@ -81,31 +93,51 @@ var Roughcogs = {
 		});
 	},
 
-	haves: function($row) {
+	// where needs to be an index
+	addTableHeader: function(where, text) {
+		var $headerRow = s.table.find('thead').children('tr');
+		$headerRow.children('th').eq(where).after('<th>'+ text +'</th>');
+	},
+
+	getHaves: function($row) {
 		// find the string containing the haves
-		var $communityEl = $row.children('td').eq(2);
-		var $haveEl = $communityEl.find('tr:first').find('td:first');
-		var haves = $haveEl.text();
+		var $communityEl = $row.children('td:eq(2)');
+		var $dataContainer = $communityEl.find('tr:first').find('td:first');
+		var data = $dataContainer.text();
 
 		// filter it out using a regular expression
 		var r = /\d+/;
-		haves = haves.match(r);
+		data = data.match(r);
 
-		$('<td class="rc" valign="top">'+ haves +'</td>').insertAfter($communityEl);
+		return data;
+	},
+
+	getWants: function($row) {
+		// find the string containing the wants
+		var $communityEl = $row.children('td').eq(2);
+		var $dataContainer = $communityEl.find('tr:last').find('td:first');
+		var data = $dataContainer.text();
+
+		// filter it out using a regular expression
+		var r = /\d+/;
+		data = data.match(r);
+
+		return data;
+	},
+
+	haves: function($row) {
+		// get
+		var haves = this.getHaves($row);
+		// set
+		$('<td class="rc" valign="top">'+ haves +'</td>').insertAfter($row.children('td:eq(2)'));
 		this.saveData($row, 'haves', haves);
 	},
 
 	wants: function($row) {
-		// find the string containing the wants
-		var $communityEl = $row.children('td').eq(2);
-		var $wantEl = $communityEl.find('tr:last').find('td:first');
-		var wants = $wantEl.text();
-
-		// filter it out using a regular expression
-		var r = /\d+/;
-		wants = wants.match(r);
-
-		$('<td class="rc" valign="top">'+ wants +'</td>').insertAfter($communityEl.next('td'));
+		// get
+		var wants = this.getWants($row);
+		// set
+		$('<td class="rc" valign="top">'+ wants +'</td>').insertAfter($row.children('td:eq(3)'));
 		this.saveData($row, 'wants', wants);
 	},
 
@@ -116,7 +148,7 @@ var Roughcogs = {
 		this.saveData($row, 'rating', rating);
 	},
 
-	ratio: function($row) {
+	getRatio: function($row) {
 		var $communityEl = $row.children('td').eq(2);
 
 		// get the values
@@ -128,20 +160,24 @@ var Roughcogs = {
 		var ratiov2 = (wants * 0.2) / (haves); // different method
 
 		// round it to two decimals
-		ratio = Math.round(ratio * 100) / 100
+		data = Math.round(ratio * 100) / 100;
 
-		// insert and save it
-		$('<td class="rc" valign="top">'+ ratio +'</td>').insertAfter($communityEl.next('td').next('td'));
+		return data;
+	},
+	ratio: function($row) {
+		// get
+		var ratio = this.getRatio($row);
+		// set
+		$('<td class="rc" valign="top">'+ ratio +'</td>').insertAfter($row.children('td:eq(4)'));
 		this.saveData($row, 'ratio', ratio);
 	},
 
 	price: function($row){
 
 		// get the price <td>
+		var $priceContainer = $row.children('td:last-child').prev('td');
 		if (s.type === 'release') {
-			var $priceContainer = $row.children('td:eq(2)');
-		} else {
-			var $priceContainer = $row.children('td:eq(6)');
+			$priceContainer = $row.children('td:eq(2)');
 		}
 
 		var otherCurrency = $priceContainer.find('i').length > 0;
@@ -163,7 +199,11 @@ var Roughcogs = {
 			currency = price.charAt(0);
 		}
 
-		s.table.find('th:eq(2)').html('Price in ' + currency);
+		if (s.type === 'release') {
+			s.table.find('th:eq(2)').html('Price in ' + currency);
+		} else {
+			s.table.find('th:last-child').prev('th').html('Price in ' + currency);
+		}
 
 		// strip to only the price
 		var newPrice = price.substr(price.indexOf(currency) + 1);
@@ -188,60 +228,71 @@ var Roughcogs = {
 		return price;
 	},
 
-	graphs: function() {
-		//var max = loop haves
-	},
+	graphs: function($row) {
+		s.max = 0;
 
-	saveData: function($row, property, value) {
-		$row.attr('data-' + property + '', value).data(property, value);
+		// get the single highest value of haves and wants
+		var rowMax = Math.max( $(this).data('haves'), $(this).data('wants') );
 
-		if (s.type === 'list') {
-			var $communityEl = $row.children('td').eq(2);
-			$communityEl.append('<div class="Rough-'+ property +'"><em>' + value + '</em> '+ property +'</div>');
+		if (rowMax > s.max) {
+			s.max = rowMax;
 		}
+
+		this.saveData($row, max, rowMax);
+		// divide every value like this: have/max*100
 	},
 
 	tablesorting: function() {
 		$('.mpitems').dataTable({
-
 			// disable pagination
 			"bPaginate": false,
-
 			// show a processing indicator
 			"bProcessing": true,
-
 			//"bSortClasses": false,
-
 			"aoColumnDefs": [
 				// disable sorting on 'cover' and 'buy'
 				{ "bSortable": false, "aTargets": [ 0,-1 ] },
-
 				// hide community data
 				{ "bVisible": false, "aTargets": [ 2 ] },
-
 				// change default sorting method to descending
-				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 3,4,5 ] },
-
+				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 3,4,5] },
 				// set 'haves', 'wants' and 'ratio' as numeric values
 				{ "sType": "numeric", "aTargets": [ 3,4,5 ] }
-
-
-				// // temporary hide everything but price
-				// { "bVisible": false, "aTargets": [ 0,1,3,4,5,7 ] },
-				// {
-				// 	"aTargets": [ 0 ],
-				// 	"mData": function(source,type, val) {
-				// 		var string = 'no price'
-				// 		if (source[6]) {
-				// 			string = s.self.getPrice( source[6] );
-				// 		}
-				// 		return string;
-
-				// 	}
-				// }
 			]
 
 		});
+	},
+
+	tablesortingRelease: function() {
+		var table = $('.mpitems').dataTable({
+			// disable pagination
+			"bPaginate": false,
+			// show a processing indicator
+			"bProcessing": true,
+			//"bSortClasses": false,
+			"aoColumnDefs": [
+				// disable sorting on 'condition', 'seller info' and 'buy'
+				{ "bSortable": false, "aTargets": [ 0,,1-1 ] },
+				// change default sorting method to descending
+				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 2 ] },
+				// set 'price' as numeric values
+				{ "sType": "numeric", "aTargets": [ 2 ] }
+			]
+		});
+
+		// Sort immediately with 'price' column
+		table.fnSort([ [2,'asc'] ]);
+	},
+
+	saveData: function($row, property, value) {
+
+		// set the data as attr on the row
+		$row.attr('data-' + property + '', value).data(property, value);
+
+		// if (s.type === 'list') {
+		// 	var $communityEl = $row.children('td').eq(2);
+		// 	$communityEl.append('<div class="Rough-'+ property +'"><em>' + value + '</em> '+ property +'</div>');
+		// }
 	},
 
 	changeTagName: function(el, newTagName) {
