@@ -25,6 +25,17 @@ body {
 	background-color: transparent;
 }
 
+.Roughcogs-table td[nowrap] {
+	white-space: normal;
+}
+
+.mpitems tr td:last-child {
+	max-width: none;
+}
+
+.Roughcogs--release > tbody > tr > td:nth-child(2) li { display: inline; }
+.Roughcogs--release > tbody > tr > td:nth-child(2) li:nth-child(2n) { display: none; }
+
 /*
  * Table
  */
@@ -43,6 +54,7 @@ body {
 }
 .dataTable .sorting_disabled {
 	cursor: default;
+	font-weight: normal;
 }
 .dataTable td {
 	padding-right: 19px;
@@ -82,7 +94,7 @@ body {
  * Filter
  */
 .dataTables_filter {
-	float: right;
+	float: left;
 	text-align: right;
 }
 

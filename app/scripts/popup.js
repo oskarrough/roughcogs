@@ -3,7 +3,8 @@ var Roughcogs = {
 	settings: {
 		type: 'list',
 		table: $('.mpitems'),
-		collection: $('.mpitems').children('tbody')
+		collection: $('.mpitems').children('tbody'),
+		max: 0
 	},
 
 	init: function(options) {
@@ -24,10 +25,14 @@ var Roughcogs = {
 		var release = s.table.find('thead').length > 0;
 		if (release) {
 			s.type = 'release';
+			s.table.addClass('Roughcogs--release');
+		}
+		else {
+			s.table.addClass('Roughcogs--list');
 		}
 
 		// GOGOGOGO
-		s.table.addClass('is-loadingRoughCogs');
+		s.table.addClass('Roughcogs-table is-loading');
 
 		if (s.type === 'list') {
 			this.header();
@@ -66,14 +71,6 @@ var Roughcogs = {
 	},
 
 	columns: function() {
-
-		// we are adding new cols for haves, wants and ratio
-		// so add the complementary <th> for them
-		var $headerRow = s.table.find('thead').children('tr');
-
-		// insert them after the 3rd col
-		//$headerRow.children('th:eq(2)').after('<th>Haves</th><th>Wants</th><th>Ratio</th>');
-
 		s.self.addTableHeader(2, 'Haves');
 		s.self.addTableHeader(3, 'Wants');
 		s.self.addTableHeader(4, 'Ratio');
@@ -83,7 +80,7 @@ var Roughcogs = {
 			s.self.haves($(this));
 			s.self.wants($(this));
 			s.self.ratio($(this));
-			//s.self.graphs($this));
+			//	s.self.graphs($(this));
 		});
 	},
 
@@ -214,50 +211,39 @@ var Roughcogs = {
 
 		//console.log(price + ' --> ' + currency + newPrice);
 		$priceContainer.html(newPrice);
-		this.saveData($row, 'price', price);
-	},
-
-	getPrice: function(string) {
-
-		// turn it into a js object and get the text
-		price = $(string)[0].innerText;
-
-		// remove currency symbol
-		price = price.substring(1);
-
-		return price;
+		this.saveData($row, 'price', newPrice);
 	},
 
 	graphs: function($row) {
-		s.max = 0;
-
 		// get the single highest value of haves and wants
-		var rowMax = Math.max( $(this).data('haves'), $(this).data('wants') );
+		var rowMax = Math.max( $row.data('haves'), $row.data('wants') );
 
 		if (rowMax > s.max) {
 			s.max = rowMax;
 		}
 
-		this.saveData($row, max, rowMax);
+		this.saveData($row, 'max', rowMax);
 		// divide every value like this: have/max*100
 	},
 
 	tablesorting: function() {
 		var table = $('.mpitems').dataTable({
+			// disable inline px widths
+			'bAutoWidth': false,
 			// disable pagination
-			"bPaginate": false,
+			'bPaginate': false,
 			// show a processing indicator
-			"bProcessing": true,
-			//"bSortClasses": false,
-			"aoColumnDefs": [
-				// disable sorting on 'cover' and 'buy'
-				{ "bSortable": false, "aTargets": [ 0,-1 ] },
+			'bProcessing': true,
+			//'bSortClasses': false,
+			'aoColumnDefs': [
+				// disable sorting on 'cover', 'sellerinfo' and 'buy'
+				{ 'bSortable': false, 'aTargets': [ 0,-3, -1 ] },
 				// hide community data
-				{ "bVisible": false, "aTargets": [ 2 ] },
+				{ 'bVisible': false, 'aTargets': [ 2 ] },
 				// change default sorting method to descending
-				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 3,4,5] },
+				{ 'asSorting': [ 'desc', 'asc' ], 'aTargets': [ 3,4,5] },
 				// set 'haves', 'wants', 'ratio' and 'price' as numeric values
-				{ "sType": "numeric", "aTargets": [ 3,4,5,7 ] }
+				{ 'sType': 'numeric', 'aTargets': [ 3,4,5,7 ] }
 			]
 		});
 
@@ -267,18 +253,20 @@ var Roughcogs = {
 
 	tablesortingRelease: function() {
 		var table = $('.mpitems').dataTable({
+			// disable inline px widths
+			'bAutoWidth': false,
 			// disable pagination
-			"bPaginate": false,
+			'bPaginate': false,
 			// show a processing indicator
-			"bProcessing": true,
-			//"bSortClasses": false,
-			"aoColumnDefs": [
+			'bProcessing': true,
+			//'bSortClasses': false,
+			'aoColumnDefs': [
 				// disable sorting on 'condition', 'seller info' and 'buy'
-				{ "bSortable": false, "aTargets": [ 0,,1-1 ] },
+				{ 'bSortable': false, 'aTargets': [ 0,1,-1 ] },
 				// change default sorting method to descending
-				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 2 ] },
+				{ 'asSorting': [ 'desc', 'asc' ], 'aTargets': [ 2 ] },
 				// set 'price' as numeric values
-				{ "sType": "numeric", "aTargets": [ 2 ] }
+				{ 'sType': 'numeric', 'aTargets': [ 2 ] }
 			]
 		});
 
