@@ -243,7 +243,7 @@ var Roughcogs = {
 	},
 
 	tablesorting: function() {
-		$('.mpitems').dataTable({
+		var table = $('.mpitems').dataTable({
 			// disable pagination
 			"bPaginate": false,
 			// show a processing indicator
@@ -256,11 +256,13 @@ var Roughcogs = {
 				{ "bVisible": false, "aTargets": [ 2 ] },
 				// change default sorting method to descending
 				{ "asSorting": [ "desc", "asc" ], "aTargets": [ 3,4,5] },
-				// set 'haves', 'wants' and 'ratio' as numeric values
-				{ "sType": "numeric", "aTargets": [ 3,4,5 ] }
+				// set 'haves', 'wants', 'ratio' and 'price' as numeric values
+				{ "sType": "numeric", "aTargets": [ 3,4,5,7 ] }
 			]
-
 		});
+
+		// Sort immediately with 'price' column
+		table.fnSort([ [2,'asc'] ]);
 	},
 
 	tablesortingRelease: function() {
