@@ -1,7 +1,4 @@
-'use strict';
-
-var s,
-SliderWidget = {
+var Roughcogs = {
 
 	settings: {
 		table: $('.mpitems'),
@@ -15,23 +12,25 @@ SliderWidget = {
 
 		console.log('Roughcogs initialized');
 
+		// only run if there is a table
 		if (s.table.length < 1) {
 			console.log('no table found');
 			return false;
 		}
 
+		if (s.table.find('thead').length > 0) {
+			console.log('thead found');
+		}
+
+		s.table.addClass('is-loadingRoughCogs');
 		this.prepareHTML();
-
-		s.collection.children('tr').each(function(index) {
-			s.self.haves($(this));
-			s.self.wants($(this));
-			s.self.ratio($(this));
-			s.self.price($(this));
-		});
-
+		this.changeMarkup();
 		this.tablesorting();
+		s.table.removeClass('is-loading').addClass('is-processed');
+	},
 
-		s.table.addClass('is-processed');
+	graphs: function() {
+		//var max = loop haves
 	},
 
 	prepareHTML: function() {
@@ -55,6 +54,15 @@ SliderWidget = {
 
 	},
 
+	changeMarkup: function() {
+		s.collection.children('tr').each(function(index) {
+			s.self.haves($(this));
+			s.self.wants($(this));
+			s.self.ratio($(this));
+			s.self.price($(this));
+		});
+	},
+
 	haves: function($row) {
 		// find the string containing the haves
 		var $communityEl = $row.children('td').eq(2);
@@ -66,7 +74,6 @@ SliderWidget = {
 		haves = haves.match(r);
 
 		$('<td class="rc" valign="top">'+ haves +'</td>').insertAfter($communityEl);
-
 		this.saveData($row, 'haves', haves);
 	},
 
@@ -152,6 +159,7 @@ SliderWidget = {
 
 	saveData: function($row, property, value) {
 		var $communityEl = $row.children('td').eq(2);
+		//
 
 		$communityEl.append('<div class="Rough-'+ property +'"><em>' + value + '</em> '+ property +'</div>');
 		$row.attr('data-' + property + '', value).data(property, value);
@@ -213,5 +221,5 @@ SliderWidget = {
 };
 
 $(function(){
-	SliderWidget.init();
+	Roughcogs.init();
 });

@@ -14,38 +14,16 @@ body {
 	display: none;
 }*/
 
-.mpitems {
-	opacity: 0.1;
+.mpitems.is-loading {
+	-webkit-transition: opacity 250ms;
+	transition: opacity 250ms;
+	opacity: 0.5;
 	background-color: #ccc;
 }
 .mpitems.is-processed {
 	opacity: 1;
 	background-color: transparent;
 }
-
-/*
-.sorting_asc,
-.sorting_desc {
-	color: red;
-	font-weight: bold;
-}
-
-
-.DataTables_processing {
-	position: fixed;
-	top: 50%;
-	left: 0;
-	width: 100%;
-	text-align: center;
-	background: red;
-	color: white;
-}
-*/
-
-
-
-
-
 
 /*
  * Table
