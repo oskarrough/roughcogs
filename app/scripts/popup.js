@@ -1,6 +1,7 @@
 var Roughcogs = {
 
 	settings: {
+		type: 'list',
 		table: $('.mpitems'),
 		collection: $('.mpitems').children('tbody')
 	},
@@ -12,28 +13,36 @@ var Roughcogs = {
 
 		console.log('Roughcogs initialized');
 
-		// only run if there is a table
-		if (s.table.length < 1) {
+		// Only run if there is a table
+		var tableExists = s.table.length < 1;
+		if (tableExists) {
 			console.log('no table found');
 			return false;
 		}
 
-		if (s.table.find('thead').length > 0) {
-			console.log('thead found');
+		// Check the type of page we are on
+		var releaseList = s.table.find('thead').length > 0;
+		if (releaseList) {
+			s.type = 'release';
 		}
 
+		// GOGOGOGO
 		s.table.addClass('is-loadingRoughCogs');
-		this.prepareHTML();
-		this.changeMarkup();
-		this.tablesorting();
+
+		if (s.type === 'list') {
+			this.header();
+			this.columns();
+		}
+
+		if (s.type === 'release') {
+			this.columnsRelease();
+		}
+
+		//this.tablesorting();
 		s.table.removeClass('is-loading').addClass('is-processed');
 	},
 
-	graphs: function() {
-		//var max = loop haves
-	},
-
-	prepareHTML: function() {
+	header: function() {
 		var $headerRow = s.collection.children('tr').eq(0);
 		$headerRow
 			// create a thead
@@ -48,17 +57,26 @@ var Roughcogs = {
 			.find('th:first').removeAttr('colspan')
 			// and insert missing column to fit the one in tbody
 			.before('<th>Cover</th>').end();
-
-		// insert extra cols for our custom stuff
-		$headerRow.find('th:eq(2)').after('<th>Haves</th><th>Wants</th><th>Ratio</th>');
-
 	},
 
-	changeMarkup: function() {
+	columns: function() {
+		// we are adding new cols for haves, wants and ratio
+		// so add the complementary <th> for them
+		var $headerRow = s.collection.children('tr').eq(0);
+		// insert them after the 3rd col
+		$headerRow.find('th:eq(2)')
+			.after('<th>Haves</th><th>Wants</th><th>Ratio</th>');
+
 		s.collection.children('tr').each(function(index) {
 			s.self.haves($(this));
 			s.self.wants($(this));
 			s.self.ratio($(this));
+			s.self.price($(this));
+		});
+	},
+
+	columnsRelease: function() {
+		s.collection.children('tr').each(function(index) {
 			s.self.price($(this));
 		});
 	},
@@ -95,7 +113,6 @@ var Roughcogs = {
 		var $communityEl = $row.children('td').eq(2);
 
 		// TODO
-
 		this.saveData($row, 'rating', rating);
 	},
 
@@ -119,30 +136,44 @@ var Roughcogs = {
 	},
 
 	price: function($row){
-		var $priceEl = $row.children('td:eq(6)');
-		var price = $priceEl.find('.price').text();
 
-		// if ($row.index() === 1) {
-		// 	var $headerRow = s.collection.children('tr').eq(0);
-		// 	var $priceHeader = $headerRow.children('th').eq(6);
+		// get the price <td>
+		if (s.type === 'release') {
+			var $priceContainer = $row.children('td:eq(2)');
+		} else {
+			var $priceContainer = $row.children('td:eq(6)');
+		}
 
-		// 	var newTitle = price.toString().atChar(0) + price;
-		// 	$priceHeader.text(newTitle);
-		// }
+		var otherCurrency = $priceContainer.find('i').length > 0;
+		var currency;
 
-		//var priceEuro = pricePounds.next('span i').text();
+		// get element containg the price
+		var $price = $priceContainer.find('.price');
+		if (otherCurrency) {
+			$price = $priceContainer.find('i');
+		}
 
-		// filter it out using a regular expression
-		//var r = /\d+/;
-		//pricePounds = pricePounds.match(r);
+		// get the price without currency
+		var price = $price.text();
 
-		//var currencySymbol = price.atChar(0);
+		// define which currency is the primary one
+		if (otherCurrency) {
+			currency = price.charAt(7);
+		} else {
+			currency = price.charAt(0);
+		}
 
-		// remove currency from string
-		price = price.substring(1);
-		//$priceEl.html(Math.round(price * 8.77965874) + ' kr');
+		s.table.find('th:eq(2)').html('Price in ' + currency);
 
-		$priceEl.html(price);
+		// strip to only the price
+		var newPrice = price.substr(price.indexOf(currency) + 1);
+		// remove extra last ')' character
+		if (otherCurrency) {
+			newPrice = newPrice.slice(0, - 1);
+		}
+
+		//console.log(price + ' --> ' + currency + newPrice);
+		$priceContainer.html(newPrice);
 		this.saveData($row, 'price', price);
 	},
 
@@ -157,12 +188,17 @@ var Roughcogs = {
 		return price;
 	},
 
-	saveData: function($row, property, value) {
-		var $communityEl = $row.children('td').eq(2);
-		//
+	graphs: function() {
+		//var max = loop haves
+	},
 
-		$communityEl.append('<div class="Rough-'+ property +'"><em>' + value + '</em> '+ property +'</div>');
+	saveData: function($row, property, value) {
 		$row.attr('data-' + property + '', value).data(property, value);
+
+		if (s.type === 'list') {
+			var $communityEl = $row.children('td').eq(2);
+			$communityEl.append('<div class="Rough-'+ property +'"><em>' + value + '</em> '+ property +'</div>');
+		}
 	},
 
 	tablesorting: function() {
